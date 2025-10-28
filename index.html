@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smooth Banners with Menu</title>
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- External CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Menu Overlay -->
+<div class="menu-overlay" id="menuOverlay">
+  <div class="menu-content">
+    <p class="menu-item"><a href="index.html">HOME</a> <span class="arrow">→</span></p>
+    <p class="menu-item"><a href="about.html">ABOUT</a> <span class="arrow">→</span></p>
+    <p class="menu-item"><a href="portfolio.html">PORTFOLIO</a> <span class="arrow">→</span></p>
+    <p class="menu-item"><a href="contact.html">CONTACT</a> <span class="arrow">→</span></p>
+
+     
+
+
+  </div>
+  
+</div>
+
+
+
+<div class="menu-overlay" id="menuOverlay">
+  <div class="content">
+   <p>Loex  Maxime, voluptates.</p>
+  </div>
+</div>
+<!-- Menu Button -->
+<button class="menu-btn" id="menuBtn">☰</button>
+
+<!-- Banners -->
+<section style="background-image:url('https://picsum.photos/id/1015/1920/1080');" class="active">
+  <h1>Banner 1</h1>
+</section>
+<section style="background-image:url('https://picsum.photos/id/1016/1920/1080');">
+  <h1>Banner 2</h1>
+</section>
+<section style="background-image:url('https://picsum.photos/id/1018/1920/1080');">
+  <h1>Banner 3</h1>
+</section>
+<section style="background-image:url('https://picsum.photos/id/1020/1920/1080');">
+  <h1>Banner 4</h1>
+</section>
+
+<!-- JavaScript -->
+<script>
+const sections = document.querySelectorAll('section');
+let current = 0;
+let isScrolling = false;
+
+// Menu
+const menuBtn = document.getElementById('menuBtn');
+const menuOverlay = document.getElementById('menuOverlay');
+let menuOpen = false;
+
+// Scroll animation
+function goTo(index) {
+  if(index < 0 || index >= sections.length || isScrolling) return;
+  isScrolling = true;
+
+  sections.forEach((sec, i) => {
+    sec.classList.remove('active');
+    sec.style.transform = `translateY(${i > index ? 100 : i < index ? -100 : 0}%)`;
+    sec.style.opacity = i === index ? 1 : 0;
+  });
+
+  sections[index].classList.add('active');
+  current = index;
+
+  setTimeout(() => { isScrolling = false; }, 1200);
+}
+
+// Drag and touch scroll
+let isDragging = false, startY = 0, deltaY = 0;
+sections.forEach(sec => {
+  sec.addEventListener('mousedown', e => { isDragging = true; startY = e.clientY; sec.style.cursor = 'grabbing'; });
+  window.addEventListener('mousemove', e => { if(isDragging) deltaY = e.clientY - startY; });
+  sec.addEventListener('mouseup', () => { handleDrag(); });
+  sec.addEventListener('mouseleave', () => { if(isDragging){ isDragging = false; sec.style.cursor = 'grab'; deltaY=0; }});  
+  sec.addEventListener('touchstart', e => { isDragging=true; startY=e.touches[0].clientY; });
+  sec.addEventListener('touchmove', e => { if(isDragging) deltaY=e.touches[0].clientY - startY; });
+  sec.addEventListener('touchend', () => { handleDrag(); });
+});
+
+function handleDrag() {
+  if(!isDragging) return;
+  isDragging=false;
+  sections[current].style.cursor='grab';
+  if(deltaY < -50) goTo(current+1);
+  else if(deltaY > 50) goTo(current-1);
+  deltaY=0;
+}
+
+// Wheel scroll
+window.addEventListener('wheel', e => { if(!isScrolling) e.deltaY>0?goTo(current+1):goTo(current-1); });
+
+// Keyboard arrows
+window.addEventListener('keydown', e => { if(!isScrolling) { if(e.key==='ArrowDown') goTo(current+1); if(e.key==='ArrowUp') goTo(current-1); } });
+
+// Menu toggle
+menuBtn.addEventListener('click', () => {
+  menuOpen = !menuOpen;
+  menuOverlay.classList.toggle('active', menuOpen);
+  if(menuOpen) sections[current].style.transform='translateY(50%)';
+  else sections[current].style.transform='translateY(0)';
+});
+</script>
+
+</body>
+</html>
